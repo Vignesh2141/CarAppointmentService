@@ -1,8 +1,7 @@
-package com.example.car_service_appointment.controller;
+package com.example.car.service.appointment.controller;
 
-import com.example.car_service_appointment.entity.Appointment;
-import com.example.car_service_appointment.service.SlotService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.car.service.appointment.entity.Appointment;
+import com.example.car.service.appointment.service.SlotService;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -12,8 +11,6 @@ import java.util.List;
 @RequestMapping("/appointment")
 public class ApplicationController {
     private final SlotService slotService;
-
-    @Autowired
     public ApplicationController(SlotService slotService){
         this.slotService=slotService;
     }

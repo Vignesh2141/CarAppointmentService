@@ -1,25 +1,25 @@
-package com.example.car_service_appointment.service;
+package com.example.car.service.appointment.service;
 
-import com.example.car_service_appointment.entity.Appointment;
-import com.example.car_service_appointment.entity.AvailableSlots;
-import com.example.car_service_appointment.entity.BookedSlots;
-import com.example.car_service_appointment.repository.SlotRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.car.service.appointment.entity.Appointment;
+import com.example.car.service.appointment.entity.AvailableSlots;
+import com.example.car.service.appointment.entity.BookedSlots;
+import com.example.car.service.appointment.repository.SlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SlotService {
 
     private final SlotRepository slotRepository;
 
-    @Autowired
-    public SlotService(SlotRepository slotRepository){
-        this.slotRepository=slotRepository;
+    public SlotService(SlotRepository slotRepository) {
+        this.slotRepository = slotRepository;
     }
 
     public List<Appointment> getAllApplication(){
@@ -38,10 +38,10 @@ public class SlotService {
         boolean isSlotBooked = booked.stream().anyMatch(book -> book.equals(application.getTime()));
 
         if (!isSlotBooked) {
-            if (optionalBookedSlots.isEmpty()) {
-                BookedSlots newBookedSlots = new BookedSlots();
-                newBookedSlots.setSlotDate(date);
-                slotRepository.save(newBookedSlots);
+            if (optionalBookedSlots.equals(Optional.empty())) {
+                slotRepository.save(
+                        BookedSlots.builder().slotDate(date).build()
+                );
             }
             booked.add(application.getTime());
             slotRepository.save(application);
@@ -56,19 +56,20 @@ public class SlotService {
     public AvailableSlots getAvailableSlots(Date date) throws ParseException {
         LocalTime startTime = LocalTime.of(0, 0);
         LocalTime endTime = LocalTime.of(23, 0);
-        AvailableSlots availableSlots1=new AvailableSlots();
+
         BookedSlots slots=slotRepository.getBookedSlots(date);
         List<LocalTime> slotTime=slots.getSlotsBooked();
         List<LocalTime> possibleSlots = generatePossibleSlots(startTime, endTime);
         Optional<BookedSlots> optionalSlots = Optional.of(slots);
+
         List<LocalTime> availableSlots = optionalSlots.map(slotsList -> {
             List<LocalTime> slotsCopy = new ArrayList<>(possibleSlots);
             slotsCopy.removeAll(slotTime);
             return slotsCopy;
         }).orElse(possibleSlots);
 
-        availableSlots1.setSlotsAvailable(availableSlots);
-        return availableSlots1;
+        return AvailableSlots.builder().slotsAvailable(availableSlots).build();
+
     }
 
     private List<LocalTime> generatePossibleSlots(LocalTime startTime, LocalTime endTime) {
@@ -82,13 +83,6 @@ public class SlotService {
             }
         }
         return slots;
-    }
-
-    public void addSlots(BookedSlots bookedSlots) throws ParseException {
-        SimpleDateFormat date1=new SimpleDateFormat("yyyy-MM-dd");
-        String  applicationDate=date1.format(bookedSlots.getSlotDate());
-        bookedSlots.setSlotDate(date1.parse(applicationDate));
-        slotRepository.save(bookedSlots);
     }
 
     public String cancelAppointment(String id) throws ParseException {

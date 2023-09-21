@@ -1,4 +1,4 @@
-package com.example.car_service_appointment.entity;
+package com.example.car.service.appointment.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -19,11 +19,8 @@ public class Appointment {
 
     @Id
     private String appointmentId;
-
     private String serviceOperator;
-
     private String customerName;
-
     @JsonSerialize(using = DateSerializer.class)
     @JsonDeserialize(using = DateDeserializer.class)
     private Date date;

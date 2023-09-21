@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      database: car_service_db
+      uri: mongodb://localhost:27017/car_service_db?waitqueuemultiple=10&w=1&maxpoolsize=50&safe=true

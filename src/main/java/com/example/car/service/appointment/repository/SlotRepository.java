@@ -1,14 +1,14 @@
-package com.example.car_service_appointment.repository;
+package com.example.car.service.appointment.repository;
 
-import com.example.car_service_appointment.entity.Appointment;
-import com.example.car_service_appointment.entity.BookedSlots;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.car.service.appointment.entity.Appointment;
+import com.example.car.service.appointment.entity.BookedSlots;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
@@ -19,10 +19,11 @@ import java.util.List;
 public class SlotRepository {
 
     private final MongoTemplate mongoTemplate;
-    @Autowired
-    public  SlotRepository(MongoTemplate mongoTemplate){
-        this.mongoTemplate=mongoTemplate;
+
+    public SlotRepository(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
+
 
     public List<Appointment> getApplications(){
         return mongoTemplate.findAll(Appointment.class);
@@ -40,18 +41,14 @@ public class SlotRepository {
 
     public BookedSlots getBookedSlots(Date date) throws ParseException {
         Query query=new Query();
-        SimpleDateFormat date1=new SimpleDateFormat("yyyy-MM-dd");
-        String date2=date1.format(date);
-        query.addCriteria(Criteria.where("slotDate").is(date1.parse(date2)));
+        query.addCriteria(Criteria.where("slotDate").is(dateParseAndFormat(date)));
         return mongoTemplate.findOne(query,BookedSlots.class);
     }
 
     public void updateSlots(Date date, List<LocalTime> booked) throws ParseException {
         Update update=new Update();
-        SimpleDateFormat date1=new SimpleDateFormat("yyyy-MM-dd");
-        String date2=date1.format(date);
         Query query=new Query();
-        query.addCriteria(Criteria.where("slotDate").is(date1.parse(date2)));
+        query.addCriteria(Criteria.where("slotDate").is(dateParseAndFormat(date)));
         update.set("slotsBooked",booked);
         mongoTemplate.updateFirst(query,update,BookedSlots.class);
     }
@@ -71,6 +68,14 @@ public class SlotRepository {
         mongoTemplate.remove(query,Appointment.class);
     }
 
+    // This method is used to parse the date and format it to the desired format
+    // This is supporting function for repository class
+    private Serializable dateParseAndFormat(Date date) throws ParseException {
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.parse(dateFormat.format(date));
+
+
+    }
 
 
 }

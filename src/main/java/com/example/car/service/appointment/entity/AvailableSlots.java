@@ -1,6 +1,7 @@
-package com.example.car_service_appointment.entity;
+package com.example.car.service.appointment.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AvailableSlots {
     List<LocalTime> slotsAvailable;
 }
